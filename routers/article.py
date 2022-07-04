@@ -1,12 +1,10 @@
-from typing import List, Dict
-from fastapi import APIRouter, Depends, status, Response
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm.session import Session
 
+from auth.oatuh2 import get_current_user
+from db import db_article
 from db.database import get_db
 from schemas import ArticleBase, ArticleDisplayBase, UserDisplayBase
-from db import db_article
-from auth.oatuh2 import get_current_user
-
 
 router = APIRouter(prefix='/article', tags=['article'])
 

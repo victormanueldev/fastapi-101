@@ -1,10 +1,20 @@
-from typing import Dict, Optional, List
 from enum import Enum
+from typing import Dict, Optional, List
+import time
 
 from fastapi import APIRouter, Header, Cookie
 from fastapi import status, Response
 
 router = APIRouter(prefix='/blog', tags=['blog'])
+
+
+async def time_consuming_operation():
+    """
+    Simulates an operation that takes any time to be completed
+    :return:
+    """
+    time.sleep(5)
+    return "ok"
 
 
 @router.get(
@@ -21,9 +31,10 @@ def get_blogs(response: Response, custom_header: Optional[List[str]] = Header(No
     Handling cookies
     :return:
     """
-    response.headers['custom-response-header'] = ', '.join(custom_header)
-    response.set_cookie(key='test_cookie', value='Some test string cookie value')
-    return custom_header
+    # response.headers['custom-response-header'] = ', '.join(custom_header)
+    # response.set_cookie(key='test_cookie', value='Some test string cookie value')
+    # return custom_header
+    return {"blogs": []}
 
 
 @router.get('/all-page')
@@ -41,7 +52,17 @@ def get_paginated_blogs(page=1, page_size: Optional[int] = None, test_cookie: Op
 
 
 @router.get('/{id}/comments/{comment_id}')
-def get_blog_comments(id: str, comment_id: str, valid: bool = True, username: Optional[str] = None):
+async def get_blog_comments(id: str, comment_id: str, valid: bool = True, username: Optional[str] = None):
+    """
+    Handles asynchronous functionality in order to release resources while an operation
+    is being executed in background.
+    :param id:
+    :param comment_id:
+    :param valid:
+    :param username:
+    :return:
+    """
+    await time_consuming_operation()
     return {'message': f'Blog ID {id}, comment ID {comment_id}, valid: {valid}, username: {username}'}
 
 

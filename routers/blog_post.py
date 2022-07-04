@@ -1,8 +1,7 @@
 from typing import Dict, Optional, List
-from enum import Enum
 
 from fastapi import APIRouter
-from fastapi import status, Response, Body, Path, Query, Depends
+from fastapi import Body, Path, Query
 from pydantic import BaseModel
 
 router = APIRouter(prefix='/blog', tags=['blog'])

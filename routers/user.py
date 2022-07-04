@@ -1,11 +1,11 @@
-from typing import List, Dict
-from fastapi import APIRouter, Depends, status, Response
+from typing import List
+
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm.session import Session
 
+from db import db_user
 from db.database import get_db
 from schemas import UserBase, UserDisplayBase
-from db import db_user
-
 
 router = APIRouter(prefix='/user', tags=['user'])
 

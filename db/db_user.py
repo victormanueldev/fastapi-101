@@ -1,9 +1,11 @@
 from typing import List
-from sqlalchemy.orm.session import Session
+
 from fastapi import HTTPException, status
-from schemas import UserBase
-from db.models import DbUser
+from sqlalchemy.orm.session import Session
+
 from db.hash import Hash
+from db.models import DbUser
+from schemas import UserBase
 
 
 def create_user(db: Session, request: UserBase) -> DbUser:
