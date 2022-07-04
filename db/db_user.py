@@ -1,5 +1,6 @@
 from typing import List
 from sqlalchemy.orm.session import Session
+from fastapi import HTTPException, status
 from schemas import UserBase
 from db.models import DbUser
 from db.hash import Hash
@@ -42,7 +43,23 @@ def get_user_by_id(db: Session, id_user: int) -> DbUser:
     :param id_user:
     :return:
     """
-    return db.query(DbUser).filter(DbUser.id == id_user).first()
+    user = db.query(DbUser).filter(DbUser.id == id_user).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with {id_user} not found')
+    return user
+
+
+def get_user_by_username(db: Session, username: str) -> DbUser:
+    """
+    Repository to get an user filtered by Username
+    :param db:
+    :param username:
+    :return:
+    """
+    user = db.query(DbUser).filter(DbUser.username == username).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with {username} not found')
+    return user
 
 
 def update_user(db: Session, id_user: int, request: UserBase):
@@ -54,16 +71,15 @@ def update_user(db: Session, id_user: int, request: UserBase):
     :return:
     """
     user = db.query(DbUser).filter(DbUser.id == id_user)
-    if user is not None:
-        user.update({
-            DbUser.username: request.username,
-            DbUser.email: request.email,
-            DbUser.password: Hash().bcrypt(request.password)
-        })
-        db.commit()
-        return 'OK'
-    else:
-        return None
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with {id_user} not found')
+    user.update({
+        DbUser.username: request.username,
+        DbUser.email: request.email,
+        DbUser.password: Hash().bcrypt(request.password)
+    })
+    db.commit()
+    return 'OK'
 
 
 def delete_user(db: Session, id_user: int):
@@ -74,9 +90,8 @@ def delete_user(db: Session, id_user: int):
     :return:
     """
     user = db.query(DbUser).filter(DbUser.id == id_user).first()
-    if user is not None:
-        db.delete(user)
-        db.commit()
-        return 'OK'
-    else:
-        return None
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'User with {id_user} not found')
+    db.delete(user)
+    db.commit()
+    return 'OK'

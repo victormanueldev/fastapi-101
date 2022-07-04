@@ -1,7 +1,7 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from enum import Enum
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Header, Cookie
 from fastapi import status, Response
 
 router = APIRouter(prefix='/blog', tags=['blog'])
@@ -13,25 +13,31 @@ router = APIRouter(prefix='/blog', tags=['blog'])
     description='This API call simulates fetching all blogs',
     response_description='Retrieve all existing blogs'
 )
-def get_blogs():
+def get_blogs(response: Response, custom_header: Optional[List[str]] = Header(None)):
     """
     The order is important because there is a match between /all and parameter
     /{id_blog}.
+    Handling response and request headers
+    Handling cookies
     :return:
     """
-    return 'All blogs provided'
+    response.headers['custom-response-header'] = ', '.join(custom_header)
+    response.set_cookie(key='test_cookie', value='Some test string cookie value')
+    return custom_header
 
 
 @router.get('/all-page')
-def get_paginated_blogs(page=1, page_size: Optional[int] = None) -> Dict:
+def get_paginated_blogs(page=1, page_size: Optional[int] = None, test_cookie: Optional[str] = Cookie(None)) -> Dict:
     """
     Every parameter of the function that is not present in the URL,
     is considered as Query Parameter. Data type validations are made for query params.
+    If there is any cookie stored into the client this will be sent in the request
     :param page:
     :param page_size:
+    :param test_cookie:
     :return:
     """
-    return {'message': f'All {page_size} blogs on page {page}'}
+    return {'message': f'All {page_size} blogs on page {page}', 'cookie': f'{test_cookie}'}
 
 
 @router.get('/{id}/comments/{comment_id}')

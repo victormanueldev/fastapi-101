@@ -44,64 +44,43 @@ def get_all_users(db: Session = Depends(get_db)):
 @router.get('/{id_user}', status_code=status.HTTP_200_OK)
 def get_user_by_id(
         id_user: int,
-        db: Session = Depends(get_db),
-        response: Response = Response(status_code=status.HTTP_200_OK)):
+        db: Session = Depends(get_db)):
     """
     There was an error defining the response model so this endpoint
     has no response model for now
     :param id_user:
     :param db:
-    :param response:
     :return:
     """
     res = db_user.get_user_by_id(db, id_user)
-    if res is not None:
-        user_response = UserDisplayBase.from_orm(res)
-        return user_response
-    else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {'error': f'User with id {id_user} was not found'}
+    user_response = UserDisplayBase.from_orm(res)
+    return user_response
 
 
-# Update
 @router.patch('/{id_user}/update')
 def update_user(
         id_user: int,
         request: UserBase,
-        db: Session = Depends(get_db),
-        response: Response = Response(status_code=status.HTTP_200_OK)):
+        db: Session = Depends(get_db)):
     """
     We need to validate if there is a user with the ID provided
     :param id_user:
     :param request:
     :param db:
-    :param response:
     :return:
     """
     result = db_user.update_user(db, id_user, request)
-    if result is not None:
-        return result
-    else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {'error': f'User with id {id_user} was not found'}
+    return result
 
 
-# Delete
 @router.delete('/{id_user}')
 def delete_user(
         id_user: int,
-        db: Session = Depends(get_db),
-        response: Response = Response(status_code=status.HTTP_200_OK)):
+        db: Session = Depends(get_db)):
     """
     We need to validate if there is a user with the ID provided
     :param id_user:
     :param db:
-    :param response:
     :return:
     """
-    result = db_user.delete_user(db, id_user)
-    if result is not None:
-        return result
-    else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {'error': f'User with id {id_user} was not found'}
+    return db_user.delete_user(db, id_user)
